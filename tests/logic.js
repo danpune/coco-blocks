@@ -12,7 +12,7 @@ eval(src);const T=window.__t;let clock=0;
 const run=ms=>{for(let k=0;k<ms/16;k++){clock+=16;raf(clock);}};
 const key=k=>{document.h.keydown({key:k,preventDefault(){}});document.h.keyup({key:k});};
 let pass=0,fail=0;const ok=(n,c,x)=>{c?pass++:fail++;console.log((c?'PASS ':'FAIL ')+n+(c?'':'  -> '+JSON.stringify(x)));};
-const fresh=(m)=>{T(`mode='${m||'marathon'}'`);els.ovBtn.onclick();};
+const fresh=(m,opts)=>{T(`mode='${m||'marathon'}';startLevel=${(opts&&opts.level)||1};chill=${!!(opts&&opts.chill)}`);els.ovBtn.onclick();T('countT=0');run(32);};
 const fillRow=(r,holes)=>T(`for(var c=0;c<10;c++)board[${r}][c]=${JSON.stringify(holes)}.indexOf(c)<0?'J':null`);
 const force=t=>T(`cur=null;spawn('${t}')`);
 
@@ -55,7 +55,25 @@ run(600);ok('piece locks after delay',T("board[39].some(Boolean)"));
 fresh();T('lines=9');fillRow(39,[3,4,5,6]);T("board[38][0]='J'");force('I');key(' ');run(400);ok('level 2 after 10 lines',T('level')===2,T('level'));
 ok('gravity faster at level 2',T('gravMs()')<1000);
 // pause
-fresh();key('p');ok('pause',T('state')==='pause');let py=T('cur.y');run(3000);ok('nothing moves while paused',T('cur.y')===py);key('p');ok('resume',T('state')==='play');
+fresh();key('p');ok('pause',T('state')==='pause');let py=T('cur.y');run(3000);ok('nothing moves while paused',T('cur.y')===py);key('p');ok('resume starts a countdown',T('state')==='count');run(2000);ok('play continues after the countdown',T('state')==='play');
+// countdown
+T("mode='marathon';startLevel=1;chill=false");els.ovBtn.onclick();ok('new game starts with a countdown',T('state')==='count');
+let cy=T('cur.y');run(1500);ok('nothing falls during the countdown',T('state')==='count'&&T('cur.y')===cy);run(500);ok('countdown ends after about 1.8 seconds',T('state')==='play');
+// inputs during the line-clear flash are remembered
+fresh();fillRow(39,[3,4,5,6]);T("board[38][0]='J'");force('I');T("queue[0]='T'");key(' ');ok('line-clear flash is showing',!!T('clearing')&&T('cur')===null);
+key('ArrowUp');run(400);ok('rotate pressed during the flash applies to the next piece',T('cur.type')==='T'&&T('cur.rot')===1,[T('cur.type'),T('cur.rot')]);
+fresh();fillRow(39,[3,4,5,6]);T("board[38][0]='J'");force('I');T("queue[0]='S';queue[1]='Z'");key(' ');key('c');run(400);
+ok('hold pressed during the flash applies to the next piece',T('holdType')==='S'&&T('cur.type')==='Z',[T('holdType'),T('cur.type')]);
+// start level and chill
+fresh('marathon',{level:5});ok('start level 5 begins at level 5',T('level')===5);
+T('lines=9');fillRow(39,[3,4,5,6]);T("board[38][0]='J'");force('I');key(' ');run(400);ok('start level 5 reaches level 6 after 10 lines',T('level')===6,T('level'));
+fresh('marathon',{level:15});let fast=T('gravMs()');fresh('marathon',{level:15,chill:true});ok('chill caps the fall speed at level 8',T('gravMs()')>fast*10&&Math.abs(T('gravMs()')-134.7)<1,[fast,T('gravMs()')]);
+ok('chill keeps a separate best score',T('bkey()')==='marathon-chill');
+// sprint timer follows the real clock even if the browser stutters
+fresh('sprint');let e0=T('elapsed');clock+=700;raf(clock);ok('sprint timer counts a 0.7 s stutter in full',T('elapsed')-e0>=699,T('elapsed')-e0);
+// idle screens are not redrawn
+fresh();key('p');run(100);let draws=0;const realClear=ctx.clearRect;ctx.clearRect=()=>{draws++};run(1000);ctx.clearRect=realClear;ok('no redraws while paused',draws===0,draws);
+T("state='play'");
 // sprint
 fresh('sprint');T('lines=36');for(const r of[36,37,38,39])fillRow(r,[0]);T("board[35][5]='J'");force('I');key('ArrowUp');for(let k=0;k<6;k++)key('ArrowLeft');key(' ');run(400);
 ok('sprint ends at 40 lines',T('state')==='over'&&els.ovTitle.textContent==='40 LINES!',[T('state'),els.ovTitle.textContent,els.ovText.textContent]);

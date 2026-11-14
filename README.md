@@ -6,13 +6,17 @@ A falling-block puzzle game for the browser. Works with a keyboard on desktop an
 
 ## Play
 
-Open `index.html` in a browser, or host the folder with GitHub Pages.
+Play it at https://danpune.github.io/coco-blocks/ or open `index.html` in a browser.
 
-## Modes
+On an iPhone or iPad, open the link in Safari, tap Share, then "Add to Home Screen" to get an app icon that opens the game full screen.
+
+## Modes and options
 
 - **Marathon** – endless play that speeds up every 10 lines
 - **Sprint** – clear 40 lines as fast as you can
-- **Classic '84** – green-screen look, no hold, no ghost piece
+- **Classic '84** – green-screen look, random pieces, no hold and no landing outline
+- **Start level** – begin Marathon or Classic at any level from 1 to 15
+- **Chill** – the fall speed stops rising at level 8; Chill games keep their own best score
 
 ## Controls
 
@@ -25,9 +29,19 @@ Open `index.html` in a browser, or host the folder with GitHub Pages.
 | Hold | C / Shift | Tap the Hold box, or flick up |
 | Pause | P / Esc | Pause button |
 
+## Sound
+
+- The speaker button mutes everything. The ♪ button switches between the two music tracks, or turns music off.
+- Track 1 is the project's own arrangement of a traditional 19th-century Russian folk tune (public domain). Track 2, "Coco's Theme", is an original composition.
+- All sound is synthesized in the browser; there are no audio files.
+
 ## Tech
 
-One self-contained `index.html`: plain JavaScript, HTML canvas for drawing, Web Audio for the synthesized music and sound effects. No libraries, no build step, no tracking. Best scores are saved in the browser's local storage.
+`index.html` holds the whole game: plain JavaScript, HTML canvas for drawing, Web Audio for the music and sound effects. No libraries, no build step, no tracking. The only other files are the app icons and `manifest.webmanifest` for the home-screen install. Best scores and settings are saved in the browser's local storage.
+
+## Tests
+
+`node tests/logic.js` runs the rule tests (needs only Node). They also run automatically on every push through GitHub Actions.
 
 ## License
 
