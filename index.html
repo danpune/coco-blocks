@@ -423,32 +423,49 @@ function sfx(k){
 }
 
 /* ---------- music ----------
-   Two chiptune tracks played by the same little synth band (echoing lead, harmony, bouncing bass,
-   arpeggios, kick/snare/hi-hat). Each loops A (lead+bass) -> A (adds harmony + drums) -> B.
-   Track 1 is an arrangement of a traditional folk tune; track 2 "Coco's Theme" is an original composition. */
-var CH={Em:[40,64,67,71],Am:[45,57,60,64],B:[47,59,63,66],G:[43,62,67,71],C:[36,60,64,67],E:[40,56,59,64],Dm:[38,62,65,69]};   // chord: [bass note, triad...]
+   Chiptune tracks played by one little synth band (echoing lead, harmony, bouncing bass, arpeggios,
+   kick/snare/hi-hat). A track is a list of sections; each section has its melody, its chords
+   (one per quarter note) and which band members join in.
+   Track 1 arranges the traditional Russian folk song "The Little Birch Tree" (Vo pole beryoza stoyala,
+   in print since the 1790s, public domain). Track 2 "Coco's Theme" is an original composition. */
+var CH={Em:[40,64,67,71],Am:[45,57,60,64],B:[47,59,63,66],G:[43,62,67,71],C:[36,60,64,67],E:[40,56,59,64],
+        Dm:[38,62,65,69],Gm:[43,62,67,70],A:[45,61,64,69],F:[41,60,65,69]};   // chord: [bass note, triad...]
+function x4(a){var o=[];a.forEach(function(c){o.push(c,c,c,c);});return o;}   // one chord per 4/4 bar -> one per quarter note
+// melody notes are [midi note, length in eighth-notes]; 0 = rest
+var P1=[[76,1],[76,1],[76,1],[76,1],[74,2],[72,1],[72,1],[71,2]],              // verse line 1 (ends on a long A)
+    P2=[[76,1],[76,1],[79,1],[76,1],[74,2],[72,1],[72,1],[71,2]],              // verse line 2
+    P3=[[71,3],[72,1],[74,2],[72,1],[72,1],[71,2]],                            // refrain
+    END=[[69,4],[0,2]],ECHO=[[69,2],[76,1],[72,1],[69,2]],                     // plain ending / ending with a little echo
+    BV=P1.concat(END,P2,END,P3,END,P3,END),BV2=P1.concat(ECHO,P2,ECHO,P3,ECHO,P3,END),
+    BC=['Am','Am','Dm','Am','E','Am','Am','Am', 'Am','Am','Dm','Am','E','Am','Am','Am',
+        'E','Am','Dm','Am','E','Am','Am','Am', 'E','Am','Dm','Am','E','Am','Am','Am'],
+    // middle section: the tune a fourth higher (D minor) with a driving repeated-note rhythm and run-ups
+    RUN=[[74,2],[0,1],[74,1],[77,1],[81,1]],
+    BM=[[81,1],[81,1],[81,1],[81,1],[79,1],[79,1],[77,1],[77,1],[76,1],[76,1]].concat(RUN,
+       [[81,1],[81,1],[84,1],[81,1],[79,1],[79,1],[77,1],[77,1],[76,1],[76,1]],RUN,
+       [[76,3],[77,1],[79,2],[77,1],[77,1],[76,2],[74,4],[0,2]],
+       [[76,3],[77,1],[79,2],[77,1],[77,1],[76,2],[74,6]]),
+    BMC=['Dm','Dm','Gm','Dm','A','Dm','Dm','Dm', 'Dm','Dm','Gm','Dm','A','Dm','Dm','Dm',
+         'A','Dm','Gm','Dm','A','Dm','Dm','Dm', 'A','Dm','Gm','Dm','A','Dm','Dm','Dm'];
+var CA=[[76,2],[79,1],[83,1],[81,2],[79,1],[78,1], [76,2],[72,1],[76,1],[81,2],[79,1],[76,1],
+        [78,3],[75,1],[78,2],[83,2], [79,2],[83,2],[76,3],[0,1],
+        [86,2],[83,1],[79,1],[83,2],[86,2], [84,2],[81,1],[76,1],[81,2],[84,2],
+        [83,1],[81,1],[78,1],[75,1],[78,2],[81,2], [76,2],[71,2],[76,3],[0,1]],
+    CB=[[83,6],[79,2], [78,6],[75,2], [76,6],[79,2], [78,4],[83,4],
+        [84,6],[79,2], [83,6],[79,2], [81,2],[78,2],[75,2],[78,2], [76,8]],
+    CCA=['Em','Am','B','Em','G','Am','B','Em'],CCB=['Em','B','Em','B','C','G','B','Em'];
+// section flags: harm = add harmony line, drums 0 = hi-hat only, 1 = light, 2 = full kit, arp = add arpeggios
 var TRACKS=[
- {name:'Folk classic',bpm:140,          // the traditional 1860s Russian folk tune "Korobeiniki" (public domain), own arrangement
-  A:[[76,2],[71,1],[72,1],[74,2],[72,1],[71,1],[69,2],[69,1],[72,1],[76,2],[74,1],[72,1],
-     [71,3],[72,1],[74,2],[76,2],[72,2],[69,2],[69,4],
-     [0,1],[74,2],[77,1],[81,2],[79,1],[77,1],[76,3],[72,1],[76,2],[74,1],[72,1],
-     [71,2],[71,1],[72,1],[74,2],[76,2],[72,2],[69,2],[69,2],[0,2]],
-  B:[[76,4],[72,4],[74,4],[71,4],[72,4],[69,4],[68,4],[71,4],[76,4],[72,4],[74,4],[71,4],[72,2],[76,2],[81,4],[80,8]],
-  cA:['E','Am','E','Am','Dm','C','E','Am'],cB:['Am','E','Am','E','Am','E','Am','E']},
- {name:"Coco's Theme",bpm:140,          // E minor folk-dance feel: marching rhythm, oom-pah bass
-  A:[[76,2],[79,1],[83,1],[81,2],[79,1],[78,1], [76,2],[72,1],[76,1],[81,2],[79,1],[76,1],
-     [78,3],[75,1],[78,2],[83,2], [79,2],[83,2],[76,3],[0,1],
-     [86,2],[83,1],[79,1],[83,2],[86,2], [84,2],[81,1],[76,1],[81,2],[84,2],
-     [83,1],[81,1],[78,1],[75,1],[78,2],[81,2], [76,2],[71,2],[76,3],[0,1]],
-  B:[[83,6],[79,2], [78,6],[75,2], [76,6],[79,2], [78,4],[83,4],
-     [84,6],[79,2], [83,6],[79,2], [81,2],[78,2],[75,2],[78,2], [76,8]],
-  cA:['Em','Am','B','Em','G','Am','B','Em'],cB:['Em','B','Em','B','C','G','B','Em']}
+ {name:'Birch Tree',bpm:140,
+  S:[{n:BV,c:BC},{n:BV2,c:BC,harm:1,drums:2},{n:BM,c:BMC,harm:1,drums:2},{n:BV2,c:BC,harm:1,drums:2,arp:1}]},
+ {name:"Coco's Theme",bpm:140,
+  S:[{n:CA,c:x4(CCA)},{n:CA,c:x4(CCA),harm:1,drums:2},{n:CB,c:x4(CCB),harm:1,drums:1,arp:1}]}
 ];
-TRACKS.forEach(function(t){t.seq=[];t.len=0;
-  t.A.concat(t.A,t.B).forEach(function(n){if(n[0])t.seq[t.len]={m:n[0],l:n[1]};t.len+=n[1];});
-  t.bars=t.cA.concat(t.cA,t.cB).map(function(c){return CH[c];});});
-var musicSel=0,mStep=0,mNext=0,mLoops=0,bus=null,noiseBuf=null,bpmNow=0,dangerOn=false;   // musicSel: 0 folk classic, 1 Coco's Theme, 2 off
-try{var ms0=localStorage.getItem('cocoblocks.track');if(ms0==='1'||ms0==='2')musicSel=+ms0;}catch(e){}
+TRACKS.forEach(function(t){t.seq=[];t.ch=[];t.sec=[];t.len=0;
+  t.S.forEach(function(sc){var st=t.len;sc.n.forEach(function(n){if(n[0])t.seq[t.len]={m:n[0],l:n[1]};t.len+=n[1];});
+    sc.c.forEach(function(c){t.ch.push(CH[c]);});for(var i=st;i<t.len;i++)t.sec[i]=sc;});});
+var NT=TRACKS.length,musicSel=0,mStep=0,mNext=0,mLoops=0,bus=null,noiseBuf=null,bpmNow=0,dangerOn=false;   // musicSel: track number, or NT = music off
+try{var ms0=localStorage.getItem('cocoblocks.tune');if(ms0!==null&&+ms0>=0&&+ms0<=NT)musicSel=+ms0;}catch(e){}
 function harmony(m,ch){for(var d=3;d<=9;d++)for(var i=1;i<4;i++)if((m-d-ch[i])%12===0)return m-d;return 0;}   // nearest chord note below the melody
 function musicBus(){
   if(bus||!ac)return bus;
@@ -484,7 +501,7 @@ function drum(kind,t){
 }
 function stackIn(n){if(!board)return false;for(var r=TOP;r<TOP+n;r++)for(var c=0;c<COLS;c++)if(board[r][c])return true;return false;}   // any block in the top n rows?
 function musicTick(){
-  if(!ac||muted||musicSel===2||state!=='play'||!musicBus()){mNext=0;return;}
+  if(!ac||muted||musicSel>=NT||state!=='play'||!musicBus()){mNext=0;return;}
   var tr=TRACKS[musicSel],target=Math.min(tr.bpm+56,tr.bpm+(level-1)*3),e8;
   dangerOn=stackIn(dangerOn?9:7);                          // speeds up when the stack gets high; stays on until it is clearly lower
   if(dangerOn)target=Math.min(tr.bpm+80,target*1.22);
@@ -493,20 +510,21 @@ function musicTick(){
   if(mNext<ac.currentTime)mNext=ac.currentTime+.06;
   while(mNext<ac.currentTime+.25){
     bpmNow+=(target-bpmNow)*.08;e8=30/bpmNow;              // glide to the new tempo over a couple of bars
-    var t=mNext,sec=Math.floor(mStep/64),bar=Math.floor(mStep/8),s=mStep%8,full=sec===1||mLoops>0,ev=tr.seq[mStep],ch=tr.bars[bar];
+    var t=mNext,sc=tr.sec[mStep],s8=mStep%8,ev=tr.seq[mStep],ch=tr.ch[mStep>>1],dr=sc.drums||(mLoops>0?2:0);
     if(ev){
-      var d=ev.l*e8*.94,h=sec>=1?harmony(ev.m,ch):0;
+      var d=ev.l*e8*.94,h=sc.harm?harmony(ev.m,ch):0;
       mnote(ev.m,t,d,'square',.03,bus.lead,-7);mnote(ev.m,t,d,'square',.03,bus.lead,7);
       if(h)mnote(h,t,d,'square',.022,bus.master);
     }
-    mnote(ch[0]+[0,12,7,12][s%4],t,e8*.85,'triangle',.11,bus.master);
-    if(sec===2){                                          // B section: sparkling sixteenth-note arpeggios
+    mnote(ch[0]+[0,12,7,12][mStep%4],t,e8*.85,'triangle',.11,bus.master);
+    if(sc.arp){                                           // sparkling sixteenth-note arpeggios
       var k=(mStep*2)%4;
       mnote(ch[1+[0,1,2,1][k]]+12,t,e8*.45,'square',.012,bus.lead);mnote(ch[1+[0,1,2,1][(k+1)%4]]+12,t+e8/2,e8*.45,'square',.012,bus.lead);
     }
-    if(sec===2){if(s===0)drum('kick',t);if(s%2===1)drum('hat',t);if(bar===23&&s>=4)drum('snare',t);}
-    else if(full){if(s===0||s===4||(s===3&&bar%4===3))drum('kick',t);if(s===2||s===6)drum('snare',t);drum('hat',t);}
-    else if(s%2===1)drum('hat',t);
+    if(dr===2){if(mStep%4===0||(s8===3&&(mStep>>3)%4===3))drum('kick',t);if(mStep%4===2)drum('snare',t);drum('hat',t);}
+    else if(dr===1){if(s8===0)drum('kick',t);if(mStep%2===1)drum('hat',t);}
+    else if(mStep%2===1)drum('hat',t);
+    if(mStep>=tr.len-4&&dr)drum('snare',t);               // little fill before the loop restarts
     mNext+=e8;mStep++;if(mStep>=tr.len){mStep=0;mLoops++;}
   }
 }
@@ -538,8 +556,8 @@ $('lvDown').addEventListener('click',function(){startLevel=Math.max(1,startLevel
 $('lvUp').addEventListener('click',function(){startLevel=Math.min(15,startLevel+1);saveOpts();menuUI();});
 $('chillBtn').addEventListener('click',function(){chill=!chill;saveOpts();menuUI();});
 $('pauseBtn').addEventListener('click',function(){if(state==='play'||state==='count')pause();else if(state==='pause')resume();});
-function musIcon(){var b=$('musBtn');b.style.opacity=(musicSel===2||muted)?.4:1;b.textContent=musicSel===2?'♪':'♪'+(musicSel+1);b.setAttribute('aria-label',musicSel===2?'Music off':'Music: '+TRACKS[musicSel].name);}
-$('musBtn').addEventListener('click',function(){musicSel=(musicSel+1)%3;mStep=0;mLoops=0;mNext=0;bpmNow=0;musIcon();initAudio();toast={text:musicSel===2?'Music off':'♪ '+TRACKS[musicSel].name,t:0};try{localStorage.setItem('cocoblocks.track',String(musicSel));}catch(e){}});
+function musIcon(){var b=$('musBtn');b.style.opacity=(musicSel>=NT||muted)?.4:1;b.textContent=musicSel>=NT?'♪':'♪'+(musicSel+1);b.setAttribute('aria-label',musicSel>=NT?'Music off':'Music: '+TRACKS[musicSel].name);}
+$('musBtn').addEventListener('click',function(){musicSel=(musicSel+1)%(NT+1);mStep=0;mLoops=0;mNext=0;bpmNow=0;musIcon();initAudio();toast={text:musicSel>=NT?'Music off':'♪ '+TRACKS[musicSel].name,t:0};try{localStorage.setItem('cocoblocks.tune',String(musicSel));}catch(e){}});
 var SPK='<svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9h4l5-4v14l-5-4H4z" fill="currentColor"/>';
 function muteIcon(){var b=$('muteBtn');b.innerHTML=SPK+(muted?'<path d="M17 9l5 6M22 9l-5 6"/>':'<path d="M16.5 8.5a5 5 0 0 1 0 7M19.5 6a8.5 8.5 0 0 1 0 12"/>')+'</svg>';
   b.style.opacity=muted?.55:1;b.setAttribute('aria-label',muted?'Sound off (tap to turn all sound on)':'Sound on (tap to mute everything)');}

@@ -32,7 +32,7 @@ On an iPhone or iPad, open the link in Safari, tap Share, then "Add to Home Scre
 ## Sound
 
 - The speaker button mutes everything. The ♪ button switches between the two music tracks, or turns music off.
-- Track 1 is the project's own arrangement of a traditional 19th-century Russian folk tune (public domain). Track 2, "Coco's Theme", is an original composition.
+- Track 1 is the project's own arrangement of "The Little Birch Tree" (Vo pole beryoza stoyala), a traditional Russian folk song in print since the 1790s and in the public domain. Track 2, "Coco's Theme", is an original composition.
 - All sound is synthesized in the browser; there are no audio files.
 
 ## Tech

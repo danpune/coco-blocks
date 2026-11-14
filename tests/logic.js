@@ -88,6 +88,7 @@ ok('game over when stack reaches the top',T('state')==='over'&&els.ovTitle.textC
 let crashes=0;for(const m of['marathon','sprint','classic'])for(let g=0;g<15;g++){try{fresh(m);const ks=['ArrowLeft','ArrowRight','ArrowUp','z',' ','c','ArrowLeft','ArrowRight',' ','ArrowDown'];
   for(let k=0;k<4000&&T('state')==='play';k++){run(32);key(ks[Math.floor(Math.random()*ks.length)]);}}catch(e){crashes++;console.log(e.stack.split('\n').slice(0,3).join('\n'));}}
 ok('45 random games across 3 modes without errors',crashes===0,crashes);
-ok('music data: both tracks 192 steps, 24 bars',T('TRACKS.every(function(t){return t.len===192&&t.bars.length===24&&t.bars.every(Boolean)})'),T('TRACKS.map(function(t){return [t.len,t.bars.length]})'));
+ok('music data: every step of every track has a chord and a section',T('TRACKS.every(function(t){if(t.len%8||t.ch.length*2!==t.len)return false;for(var i=0;i<t.len;i++)if(!t.ch[i>>1]||!t.sec[i])return false;return true})'),T('TRACKS.map(function(t){return [t.name,t.len,t.ch.length]})'));
+ok('public build has no third track',T('TRACKS.length')===2&&T('TRACKS[0].name')==='Birch Tree');
 console.log(pass+' passed, '+fail+' failed');
 process.exit(fail?1:0);
