@@ -4,6 +4,10 @@ A falling-block puzzle game for the browser. Works with a keyboard on desktop an
 
 > **Hobby project.** Coco Blocks is a free, fan-made game with no ads and no purchases. It is not affiliated with, endorsed by, or connected to any game company or brand. All code, visuals and the music arrangement were written from scratch.
 
+## Who is Coco?
+
+Coco is the author's dog, and the game is named after her. She sits under the Next box, cheers when you clear lines, and worries when your stack gets tall.
+
 ## Play
 
 Play it at https://danpune.github.io/coco-blocks/ or open `index.html` in a browser.
