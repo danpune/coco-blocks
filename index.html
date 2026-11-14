@@ -696,6 +696,19 @@ var introText=coarse
 $('ovText').textContent=introText;
 best=bests[bkey()]||0;musIcon();muteIcon();layout();menuUI();hud();setTimeout(layout,100);
 requestAnimationFrame(frame);
+
+/* ---------- pick up new versions ----------
+   Browsers keep this page for about 10 minutes. On load, ask the server (without using the cache) whether
+   the file has changed since the last visit; if it has, reload once from a fresh address. */
+(function(){
+  if(!window.fetch||location.protocol.indexOf('http')!==0)return;
+  fetch(location.pathname,{method:'HEAD',cache:'no-store'}).then(function(r){
+    var tag=r.ok&&(r.headers.get('etag')||r.headers.get('last-modified')),prev=null;
+    if(!tag)return;
+    try{prev=localStorage.getItem('cocoblocks.etag');localStorage.setItem('cocoblocks.etag',tag);}catch(e){return;}
+    if(prev&&prev!==tag&&state==='menu')location.replace(location.pathname+'?b='+Date.now());
+  }).catch(function(){});
+})();
 })();
 </script>
 </body>
