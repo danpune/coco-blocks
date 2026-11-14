@@ -24,14 +24,16 @@ On an iPhone or iPad, open the link in Safari, tap Share, then "Add to Home Scre
 
 ## Controls
 
-| Action | Keyboard | Touch |
+| Action | Keyboard | Phone or tablet (one thumb on the pad) |
 |---|---|---|
-| Move | ← → | ◀ ▶ buttons, or drag on the board |
-| Rotate | ↑ / X (right), Z (left) | ↻ ↺ buttons, or tap the board |
-| Soft drop | ↓ | Soft Drop button, or drag down |
-| Hard drop | Space | Hard Drop button, or flick down |
-| Hold | C / Shift | Tap the Hold box, or flick up |
+| Move | ← → | Left / right on the thumb pad (hold to keep moving) |
+| Rotate | ↑ / X (right), Z (left) | Tap the centre of the pad; the small ↺ button rotates the other way |
+| Soft drop | ↓ | Down on the pad |
+| Hard drop | Space | Up on the pad (⤓) |
+| Hold | C / Shift | HOLD button |
 | Pause | P / Esc | Pause button |
+
+You can slide your thumb around the pad without lifting it. If you prefer no pad at all, choose "Swipe only" on the menu and play on the board itself: drag to move, tap to rotate, flick down to drop, flick up to hold.
 
 ## Sound
 
